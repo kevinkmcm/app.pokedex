@@ -1,0 +1,83 @@
+<div id="container">
+  <div class="row justify-content-center">
+    <mat-form-field class="search col-md-6">
+      <mat-label>Buscador</mat-label>
+      <input
+        matInput
+        [formControl]="search"
+        (keydown.enter)="onSearchPokemon()"
+        placeholder="Nombre De Tu Pokemon Favorito"
+      />
+    </mat-form-field>
+
+    <section class="col-md-6">
+      <mat-slide-toggle
+        color="primary"
+        [checked]="classicMode"
+        (change)="classicMode = !classicMode"
+      >
+        {{ classicMode ? 'Classic' : 'Gif' }}
+      </mat-slide-toggle>
+    </section>
+  </div>
+
+  <div class="row justify-content-center" *ngIf="isLoading">
+    <div class="col-4">
+      <span>Cargando...</span>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  </div>
+
+  <div *ngIf="!isSearching" class="row Pokemon__list" (scroll)="onScroll($event)">
+    <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4" *ngFor="let pokemon of pokemons; let i = index" (click)="onDetail(pokemon)">
+      <div class="card {{ 'bg-color-' + getPrincipalType(pokemon.types) + '-light' }}">
+        <div class="card__info">
+          <h2 class="color-black">{{ pokemon.name }}</h2>
+
+          <mat-tab-group class="sheet">
+            <mat-tab >
+              <div class="sheet__tab">
+                <div class="sheet__item">
+                  <div class="color-black sheet__item_label">Height: </div>
+                  <div class="color-black sheet__item_label">Weight: </div>
+                  <div class="color-black sheet__item_label">Abilities: </div>
+                </div>
+                <div class="sheet__item color-black ">
+                  <div>{{pokemon.height}}</div>
+                  <div>{{pokemon.weight}}</div>
+                  <div>{{ getAbilities(pokemon) }}</div>
+
+                </div>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+
+          <span class="color-white {{ 'bg-color-' + getPrincipalType(pokemon.types) }}" *ngFor="let type of pokemon.types">
+            {{ type.type.name }}
+          </span>
+        </div>
+        <div class="card__img">
+          <img *ngIf="classicMode" [src]="pokemon.sprites?.front_default" [alt]="pokemon.name" />
+          <img *ngIf="!classicMode" src="https://projectpokemon.org/images/normal-sprite/{{ pokemon.name }}.gif" [alt]="pokemon.name" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isSearching" class="Pokemon__list" (scroll)="onScroll($event)">
+    <div (click)="onDetail(searchPokemon)" class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+      <div class="card {{ 'bg-color-' + getPrincipalType(searchPokemon.types) + '-light' }}">
+        <div class="card__info">
+          <h2 class="color-white">{{ searchPokemon.name }}</h2>
+          <span class="color-white {{ 'bg-color-' + getPrincipalType(searchPokemon.types) }}" *ngFor="let type of searchPokemon.types">
+            {{ type.type.name }}
+          </span>
+        </div>
+        <div class="card__img">
+          <img *ngIf="classicMode" [src]="searchPokemon.sprites?.front_default" [alt]="searchPokemon.name" />
+          <img *ngIf="!classicMode" src="https://projectpokemon.org/images/normal-sprite/{{ searchPokemon.name }}.gif" [alt]="searchPokemon.name" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

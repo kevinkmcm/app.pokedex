@@ -3,16 +3,34 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { PhotoPokemonComponent } from './components/photo-pokemon/photo-pokemon.component';
+import { CardPokemonComponent } from './components/list-pokemon/card-pokemon.component';
+import { DetailComponent } from './components/detail-pokemon/detail.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
+import { MaterialModule } from './material.module';
+import { SharedModule } from './shared/shared.module';
+import { PokemonService } from './services/pokemon.service';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    CardPokemonComponent,
+    DetailComponent,
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    MaterialModule,
+    SharedModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
   ],
-  providers: [],
+  providers: [PokemonService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

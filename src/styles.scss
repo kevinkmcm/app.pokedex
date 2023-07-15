@@ -1,1 +1,133 @@
 /* You can add global styles to this file, and also import other style files */
+
+body {
+  margin: 0;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* COLORS FOR EACH TYPE OF POKEMON */
+
+$grass: #00CC00;
+$grass-light: #66FF00;
+$fire: #FF0000;
+$fire-light: #FF3300;
+$water: #0066FF;
+$water-light: #0099FF;
+$normal: #CCFFFF;
+$normal-light: #CCFFCC;
+$flying: #00FFFF;
+$flying-light: #CCFFFF;
+$bug: #CCFF00;
+$bug-light: #CCFF99;
+$poison: #660099;
+$poison-light: #9900FF;
+$electric: #FFFF00;
+$electric-light: #FFFF99;
+$ground: #CC9966;
+$ground-light: #CC9999;
+$fighting: #FFCC66;
+$fighting-light: #FFCC99;
+$psychic: #9900CC;
+$psychic-light: #9900FF;
+$rock: #663300;
+$rock-light: #993300;
+$ice: #0099FF;
+$ice-light: #66CCFF;
+$ghost: #000000;
+$ghost-light: #000033;
+$dragon: #FF6600;
+$dragon-light: #CC6633;
+$dark: #000066;
+$dark-light: #0000CC;
+$steel: #9999CC;
+$steel-light: #66FFFF;
+$fairy: #CC66FF;
+$fairy-light: #CC99FF;
+
+$gray-light: #d8d8d8;
+$gray-dark: #606060;
+$gray: #b6b6b6;
+
+$transparent: transparent;
+$black: #000000;
+$white: #ffffff;
+
+$general: (
+  'black': $black,
+  'white': $white,
+  'grass': $grass,
+  'grass-light': $grass-light,
+  'fire': $fire,
+  'fire-light': $fire-light,
+  'water': $water,
+  'water-light': $water-light,
+  'normal': $normal,
+  'normal-light': $normal-light,
+  'flying': $flying,
+  'flying-light': $flying-light,
+  'bug': $bug,
+  'bug-light': $bug-light,
+  'poison': $poison,
+  'poison-light': $poison-light,
+  'electric': $electric,
+  'electric-light': $electric-light,
+  'ground': $ground,
+  'ground-light': $ground-light,
+  'fighting': $fighting,
+  'fighting-light': $fighting-light,
+  'psychic': $psychic,
+  'psychic-light': $psychic-light,
+  'rock': $rock,
+  'rock-light': $rock-light,
+  'ice': $ice,
+  'ice-light': $ice-light,
+  'ghost': $ghost,
+  'ghost-light': $ghost-light,
+  'dragon': $dragon,
+  'dragon-light': $dragon-light,
+  'dark': $dark,
+  'dark-light': $dark-light,
+  'steel': $steel,
+  'steel-light': $steel-light,
+  'fairy': $fairy,
+  'fairy-light': $fairy-light,
+  'gray': $gray
+);
+
+
+@each $color in $general {
+  $name: nth($color, 1);
+  $value: nth($color, 2);
+  
+  .bg-color-#{$name} {
+      background-color: $value !important;
+  }
+
+  .color-#{$name} {
+      color: $value !important;
+  }
+}
+
+@for $i from 0 through 100 {
+  .w-#{$i} {
+      width: $i * 1%;
+  }
+
+  .h-#{$i} {
+      height: $i * 1%;
+  }
+}
+
+
+
+
+
