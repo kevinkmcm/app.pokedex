@@ -2,20 +2,11 @@
   <div class="row justify-content-center">
     <mat-form-field class="search col-md-6">
       <mat-label>Buscador</mat-label>
-      <input
-        matInput
-        [formControl]="search"
-        (keydown.enter)="onSearchPokemon()"
-        placeholder="Nombre De Tu Pokemon Favorito"
-      />
+      <input matInput [formControl]="search" (keydown.enter)="onSearchPokemon()" placeholder="Nombre De Tu Pokemon Favorito" />
     </mat-form-field>
 
     <section class="col-md-6">
-      <mat-slide-toggle
-        color="primary"
-        [checked]="classicMode"
-        (change)="classicMode = !classicMode"
-      >
+      <mat-slide-toggle color="primary" [checked]="classicMode" (change)="classicMode = !classicMode">
         {{ classicMode ? 'Classic' : 'Gif' }}
       </mat-slide-toggle>
     </section>
@@ -29,29 +20,13 @@
   </div>
 
   <div *ngIf="!isSearching" class="row Pokemon__list" (scroll)="onScroll($event)">
-    <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4" *ngFor="let pokemon of pokemons; let i = index" (click)="onDetail(pokemon)">
+    <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4" *ngFor="let pokemon of pokemons; let i = index" (click)="showPopup(pokemon)">
       <div class="card {{ 'bg-color-' + getPrincipalType(pokemon.types) + '-light' }}">
         <div class="card__info">
           <h2 class="color-black">{{ pokemon.name }}</h2>
-
-          <mat-tab-group class="sheet">
-            <mat-tab >
-              <div class="sheet__tab">
-                <div class="sheet__item">
-                  <div class="color-black sheet__item_label">Height: </div>
-                  <div class="color-black sheet__item_label">Weight: </div>
-                  <div class="color-black sheet__item_label">Abilities: </div>
-                </div>
-                <div class="sheet__item color-black ">
-                  <div>{{pokemon.height}}</div>
-                  <div>{{pokemon.weight}}</div>
-                  <div>{{ getAbilities(pokemon) }}</div>
-
-                </div>
-              </div>
-            </mat-tab>
-          </mat-tab-group>
-
+          <p class="color-black">Height: {{ pokemon.height }}</p>
+          <p class="color-black">Weight: {{ pokemon.weight }}</p>
+          <p class="color-black">Abilities: {{ getAbilities(pokemon) }}</p>
           <span class="color-white {{ 'bg-color-' + getPrincipalType(pokemon.types) }}" *ngFor="let type of pokemon.types">
             {{ type.type.name }}
           </span>
@@ -64,14 +39,21 @@
     </div>
   </div>
 
-  <div *ngIf="isSearching" class="Pokemon__list" (scroll)="onScroll($event)">
-    <div (click)="onDetail(searchPokemon)" class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+  <div *ngIf="isSearching" class="row Pokemon__list" (scroll)="onScroll($event)">
+    <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4" (click)="showPopup(searchPokemon)">
       <div class="card {{ 'bg-color-' + getPrincipalType(searchPokemon.types) + '-light' }}">
         <div class="card__info">
+
           <h2 class="color-white">{{ searchPokemon.name }}</h2>
+          <p class="color-black">Height: {{ searchPokemon.height }}</p>
+          <p class="color-black">Weight: {{ searchPokemon.weight }}</p>
+          <p class="color-black">Abilities: {{ getAbilities(searchPokemon) }}</p>
+          
+
           <span class="color-white {{ 'bg-color-' + getPrincipalType(searchPokemon.types) }}" *ngFor="let type of searchPokemon.types">
-            {{ type.type.name }}
+            {{ type.type.name }}   
           </span>
+
         </div>
         <div class="card__img">
           <img *ngIf="classicMode" [src]="searchPokemon.sprites?.front_default" [alt]="searchPokemon.name" />
@@ -80,4 +62,82 @@
       </div>
     </div>
   </div>
+
+  <div class="popup-container" id="popupContainer" *ngIf="selectedPokemon">
+    <div class="popup">
+      <div class="sheet__img">
+        <img *ngIf="classicMode" [src]="selectedPokemon.sprites?.front_default" [alt]="selectedPokemon.name">
+        <img *ngIf="!classicMode" src="https://projectpokemon.org/images/normal-sprite/{{selectedPokemon.name}}.gif" [alt]="selectedPokemon.name">
+    </div>
+    
+    <mat-tab-group class="sheet">
+        <mat-tab label="About">
+            <div class="sheet__tab">
+                <div class="sheet__item">
+                    <div class="color-gray sheet__item_label">encounters: </div>
+                </div>
+            </div>
+
+
+        </mat-tab>
+    
+        <mat-tab label="Stats">
+            <div class="sheet__tab">
+                <div class="sheet__item w-100">
+                    <div class="sheet__progress w-100">
+                        <div class="w-20 color-black sheet__item_label">HP:</div>
+                        <div class="w-80">
+                            <app-progress-bar [color]="getPrincipalType(selectedPokemon.types)" [value]="selectedPokemon.stats[5].base_stat"></app-progress-bar>
+                        </div>
+                    </div>
+    
+                    <div class="sheet__progress w-100">
+                        <div class="w-20 color-black sheet__item_label">Attack: </div>
+                        <div class="w-80">
+                            <app-progress-bar [color]="getPrincipalType(selectedPokemon.types)" [value]="selectedPokemon.stats[4].base_stat"></app-progress-bar>
+                        </div>
+                    </div>
+    
+                    <div class="sheet__progress w-100">
+                        <div class="w-20 color-black sheet__item_label">Defense:</div>
+                        <div class="w-80">
+                            <app-progress-bar [color]="getPrincipalType(selectedPokemon.types)" [value]="selectedPokemon.stats[3].base_stat"></app-progress-bar>
+                        </div>
+                    </div>
+    
+                    <div class="sheet__progress w-100">
+                        <div class="w-20 color-black sheet__item_label">Sp. Attack:</div>
+                        <div class="w-80">
+                            <app-progress-bar [color]="getPrincipalType(selectedPokemon.types)" [value]="selectedPokemon.stats[2].base_stat"></app-progress-bar>
+                        </div>
+                    </div>
+    
+                    <div class="sheet__progress w-100">
+                        <div class="w-20 color-black sheet__item_label">Sp. Defense:</div>
+                        <div class="w-80">
+                            <app-progress-bar [color]="getPrincipalType(selectedPokemon.types)" [value]="selectedPokemon.stats[1].base_stat"></app-progress-bar>
+                        </div>
+                    </div>
+    
+                    <div class="sheet__progress w-100">
+                        <div class="w-20 color-black sheet__item_label">Speed:</div>
+                        <div class="w-80">
+                            <app-progress-bar [color]="getPrincipalType(selectedPokemon.types)" [value]="selectedPokemon.stats[0].base_stat"></app-progress-bar>
+                        </div>
+                    </div>
+    
+                </div>
+            </div>
+        </mat-tab>
+    
+    </mat-tab-group>
+    
+      
+      <button id="closeButton" (click)="hidePopup()">Cerrar</button>
+    </div>
+  </div>
+  
 </div>
+
+
+

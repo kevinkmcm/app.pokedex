@@ -3,9 +3,9 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PhotoPokemonComponent } from './components/photo-pokemon/photo-pokemon.component';
+
 import { CardPokemonComponent } from './components/list-pokemon/card-pokemon.component';
-import { DetailComponent } from './components/detail-pokemon/detail.component';
+
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { MaterialModule } from './material.module';
@@ -18,7 +18,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   declarations: [
     AppComponent,
     CardPokemonComponent,
-    DetailComponent,
   ],
   imports: [
     BrowserModule,

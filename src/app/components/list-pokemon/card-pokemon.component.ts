@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { PokemonDetail } from '../../models/pokemon.details';
 import { PokemonService } from '../../services/pokemon.service';
@@ -6,9 +6,7 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PokemonList } from '../../models/pokemon.list';
 import { Observable, forkJoin } from 'rxjs';
-import { DetailComponent } from '../detail-pokemon/detail.component';
-
-
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-card-pokemon',
@@ -16,10 +14,15 @@ import { DetailComponent } from '../detail-pokemon/detail.component';
   styleUrls: ['./card-pokemon.component.scss']
 })
 export class CardPokemonComponent implements OnInit {
-
   search: FormControl = new FormControl('');
   pokemons: PokemonDetail[] = [];
   classicMode: boolean = true;
+
+  types: any[] = []
+
+  
+
+  @ViewChild('popupContainer', { static: false }) popupContainer!: ElementRef;
 
   private offset: number = 0;
   isLoading: boolean = false;
@@ -27,31 +30,32 @@ export class CardPokemonComponent implements OnInit {
 
   searchPokemon: PokemonDetail = new PokemonDetail();
   isSearching = false;
+  selectedPokemon: PokemonDetail | undefined;
 
-  
-
-
-  constructor(private pokemonService: PokemonService,
+  constructor(
+    private pokemonService: PokemonService,
     private bottomSheet: MatBottomSheet,
-    private snackBar: MatSnackBar) { }
+    private snackBar: MatSnackBar,
+    private http: HttpClient
+  ) {}
 
   ngOnInit(): void {
     this.getPage(this.offset);
+    this.getAmountPokemonByType();
   }
 
   getPage(offset: number): void {
     if (!this.isLoading && !this.isLastPage) {
       this.isLoading = true;
-      this.pokemonService.getPokemonList(offset)
-        .subscribe((list: PokemonList[]) => {
-          if (list.length === 0) {
-            this.isLastPage = true;
-          }
+      this.pokemonService.getPokemonList(offset).subscribe((list: PokemonList[]) => {
+        if (list.length === 0) {
+          this.isLastPage = true;
+        }
 
-          if (!this.isLastPage) {
-            this.getPokemon(list);
-          }
-        });
+        if (!this.isLastPage) {
+          this.getPokemon(list);
+        }
+      });
     }
   }
 
@@ -62,18 +66,20 @@ export class CardPokemonComponent implements OnInit {
     } else {
       this.isSearching = true;
       this.isLoading = true;
-      this.pokemonService.getPokemonDetails(value)
-        .subscribe((pokemon: PokemonDetail) => {
+      this.pokemonService.getPokemonDetails(value).subscribe(
+        (pokemon: PokemonDetail) => {
           this.searchPokemon = pokemon;
           this.isLoading = false;
-        }, (error: any) => {
+        },
+        (error: any) => {
           this.isLoading = false;
           if (error.status === 404) {
             this.snackBar.open('Pokemon no encontrado', 'OK', {
-              duration: 5000,
+              duration: 5000
             });
           }
-        });
+        }
+      );
     }
   }
 
@@ -87,9 +93,7 @@ export class CardPokemonComponent implements OnInit {
   private getPokemon(list: PokemonList[]): void {
     const arr: Observable<PokemonDetail>[] = [];
     list.map((value: PokemonList) => {
-      arr.push(
-        this.pokemonService.getPokemonDetails(value.name)
-      );
+      arr.push(this.pokemonService.getPokemonDetails(value.name));
     });
 
     forkJoin([...arr]).subscribe((pokemons: PokemonDetail[]) => {
@@ -100,21 +104,42 @@ export class CardPokemonComponent implements OnInit {
   }
 
   getPrincipalType(list: any[]): string {
-    return list.filter(x => x.slot === 1)[0]?.type.name;
-  }
-  
-
-  onDetail(pokemon: PokemonDetail): void {
-    this.bottomSheet.open(DetailComponent, {
-      data: { pokemon, classicMode: this.classicMode }
-    });
+    return list.filter((x) => x.slot === 1)[0]?.type.name;
   }
 
   getAbilities(pokemon: PokemonDetail): string {
     return pokemon.abilities.map((ability) => ability.ability.name).join(', ');
   }
-  
-  
-  
+
+  showPopup(pokemon: PokemonDetail) {
+    this.selectedPokemon = pokemon;
+    const popupContainer = document.getElementById('popupContainer');
+    if (popupContainer) {
+      popupContainer.style.display = 'flex';
+    }
+  }
+
+  hidePopup() {
+    const popupContainer = document.getElementById('popupContainer');
+    if (popupContainer) {
+      popupContainer.style.display = 'none';
+    }
+  }
+
+
+  getAmountPokemonByType(): void {
+    const url = 'https://pokeapi.co/api/v2/type';
+    this.http.get<any>(url).subscribe(response => {
+      this. types = response.results;
+
+      // Obtener cantidad de Pokémon para cada tipo
+      for (const tipo of this. types) {
+        this.http.get<any>(tipo.url).subscribe(tipoResponse => {
+          tipo.cantidadPokemon = tipoResponse.pokemon.length;
+        });
+      }
+    });
+  }
 }
+
 
