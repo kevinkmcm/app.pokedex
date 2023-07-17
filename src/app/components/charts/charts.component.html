@@ -1,4 +1,9 @@
-<ngx-charts-bar-vertical
+<div>
+
+  <div>
+    <button id="button" (click)="redirectToAbout()"> atras</button>
+  </div>
+  <ngx-charts-bar-vertical
   [view]="view"
   [results]="results"
   [gradient]="gradient"
@@ -24,3 +29,5 @@
   (select)="onSelect($event)"
   >
 </ngx-charts-pie-chart>
+</div>
+

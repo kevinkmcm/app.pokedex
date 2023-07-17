@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { LegendPosition } from '@swimlane/ngx-charts';
 import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-charts',
@@ -28,7 +29,9 @@ export class ChartsComponent implements OnInit {
   
   pokemonTypes: any[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+    private router: Router,
+    ) {}
 
   results: { name: string, value: string}[] = []
 
@@ -42,6 +45,10 @@ export class ChartsComponent implements OnInit {
        value: x.quantity
       }
     });
+  }
+
+  redirectToAbout() {
+    this.router.navigate(['']);
   }
 
   onSelect(event: any) {

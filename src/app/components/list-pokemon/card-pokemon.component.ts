@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PokemonList } from '../../models/pokemon.list';
 import { Observable, forkJoin } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-card-pokemon',
@@ -36,13 +37,18 @@ export class CardPokemonComponent implements OnInit {
     private pokemonService: PokemonService,
     private bottomSheet: MatBottomSheet,
     private snackBar: MatSnackBar,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     // si viene en la url el type no hacer el getPage sino usar el getAmountPokemonByType
     this.getPage(this.offset);
     this.getAmountPokemonByType();
+  }
+
+  redirectToAbout() {
+    this.router.navigate(['/charts']);
   }
 
   getPage(offset: number): void {
