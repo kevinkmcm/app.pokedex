@@ -13,14 +13,18 @@ import { SharedModule } from './shared/shared.module';
 import { PokemonService } from './services/pokemon.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ChartsComponent } from './components/charts/charts.component';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @NgModule({
   declarations: [
     AppComponent,
     CardPokemonComponent,
+    ChartsComponent,
   ],
   imports: [
     BrowserModule,
+    NgxChartsModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,

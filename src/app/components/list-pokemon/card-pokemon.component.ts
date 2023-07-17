@@ -40,6 +40,7 @@ export class CardPokemonComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // si viene en la url el type no hacer el getPage sino usar el getAmountPokemonByType
     this.getPage(this.offset);
     this.getAmountPokemonByType();
   }
