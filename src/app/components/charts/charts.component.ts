@@ -20,20 +20,20 @@ export class ChartsComponent implements OnInit {
   xAxisLabel = 'Pokemon Types';
   showYAxisLabel = true;
   yAxisLabel = 'Population';
-  
+
   // pie options 
-   showLabels: boolean = true;
-   isDoughnut: boolean = false;
-   legendPosition: LegendPosition =   LegendPosition.Right
-  
-  
+  showLabels: boolean = true;
+  isDoughnut: boolean = false;
+  legendPosition: LegendPosition = LegendPosition.Right
+
+
   pokemonTypes: any[] = [];
 
   constructor(private http: HttpClient,
     private router: Router,
-    ) {}
+  ) { }
 
-  results: { name: string, value: string}[] = []
+  results: { name: string, value: string }[] = []
 
   async ngOnInit() {
     const pokemonTypes = await this.getQuantityByType();
@@ -41,8 +41,8 @@ export class ChartsComponent implements OnInit {
 
     this.results = pokemonTypes.map((x) => {
       return {
-       name: x.name,
-       value: x.quantity
+        name: x.name,
+        value: x.quantity
       }
     });
   }
