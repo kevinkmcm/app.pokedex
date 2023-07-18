@@ -32,7 +32,7 @@
           <p class="color-black">Height: {{ pokemon.height }}</p>
           <p class="color-black">Weight: {{ pokemon.weight }}</p>
           <p class="color-black">Abilities: {{ getAbilities(pokemon) }}</p>
-          <span class="color-white {{ 'bg-color-' + getPrincipalType(pokemon.types) }}" *ngFor="let type of pokemon.types">
+          <span class="color-white" *ngFor="let type of pokemon.types" [ngClass]="'bg-color-' + type.type.name">
             {{ type.type.name }}
           </span>
         </div>
@@ -43,18 +43,21 @@
       </div>
     </div>
   </div>
+  
+
+
+
 
   <div *ngIf="isSearching" class="row Pokemon__list" (scroll)="onScroll($event)">
     <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4" (click)="showPopup(searchPokemon)">
       <div class="card {{ 'bg-color-' + getPrincipalType(searchPokemon.types) + '-light' }}">
         <div class="card__info">
 
-          <h2 class="color-white">{{ searchPokemon.name }}</h2>
+          <h2 class="color-black">{{ searchPokemon.name }}</h2>
           <p class="color-black">Height: {{ searchPokemon.height }}</p>
           <p class="color-black">Weight: {{ searchPokemon.weight }}</p>
           <p class="color-black">Abilities: {{ getAbilities(searchPokemon) }}</p>
           
-
           <span class="color-white {{ 'bg-color-' + getPrincipalType(searchPokemon.types) }}" *ngFor="let type of searchPokemon.types">
             {{ type.type.name }}   
           </span>
@@ -68,6 +71,9 @@
     </div>
   </div>
 
+
+  
+
   <div class="popup-container" id="popupContainer" *ngIf="selectedPokemon">
     <div class="popup">
       <div class="sheet__img">
@@ -76,16 +82,6 @@
     </div>
     
     <mat-tab-group class="sheet">
-        <mat-tab label="About">
-            <div class="sheet__tab">
-                <div class="sheet__item">
-                    <div class="color-gray sheet__item_label">encounters: </div>
-                </div>
-            </div>
-
-
-        </mat-tab>
-    
         <mat-tab label="Stats">
             <div class="sheet__tab">
                 <div class="sheet__item w-100">
@@ -138,7 +134,7 @@
     </mat-tab-group>
     
       
-      <button id="closeButton" (click)="hidePopup()">Cerrar</button>
+      <button id="button" (click)="hidePopup()">Cerrar</button>
     </div>
   </div>
   

@@ -53,6 +53,10 @@ export class ChartsComponent implements OnInit {
 
   onSelect(event: any) {
     console.log(event);
+    const name = event.name; // Capturar el nombre desde el evento
+    
+    // Redireccionar a otra ruta y enviar parámetros de consulta
+    this.router.navigate(['/home'], { queryParams: { name: name, } });
   }
 
   async getQuantityByType() {

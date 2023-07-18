@@ -7,7 +7,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PokemonList } from '../../models/pokemon.list';
 import { Observable, forkJoin } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { finalize, switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-card-pokemon',
@@ -15,19 +16,21 @@ import { Router } from '@angular/router';
   styleUrls: ['./card-pokemon.component.scss']
 })
 export class CardPokemonComponent implements OnInit {
+
   search: FormControl = new FormControl('');
   pokemons: PokemonDetail[] = [];
   classicMode: boolean = true;
+  pokemosType: PokemonDetail[] = [];
+  types: any[] = [];
 
-  types: any[] = []
-
-  
 
   @ViewChild('popupContainer', { static: false }) popupContainer!: ElementRef;
 
   private offset: number = 0;
+  private isByType : boolean = false;
   isLoading: boolean = false;
-  isLastPage = false;
+  isLastPage: boolean = false;
+  
 
   searchPokemon: PokemonDetail = new PokemonDetail();
   isSearching = false;
@@ -38,33 +41,53 @@ export class CardPokemonComponent implements OnInit {
     private bottomSheet: MatBottomSheet,
     private snackBar: MatSnackBar,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
   ) {}
 
+  // si viene en la url el type no hacer el getPage sino usar el getAmountPokemonByType
   ngOnInit(): void {
-    // si viene en la url el type no hacer el getPage sino usar el getAmountPokemonByType
-    this.getPage(this.offset);
-    this.getAmountPokemonByType();
-  }
+    this.activatedRoute.queryParams.subscribe(params => {
+      const nameParam = params[ 'name' ];  
+      if ( nameParam) {
+        this.getAmountPokemonByType(nameParam );
+        this.isByType = true;
+      } else {
+        this.getPage(this.offset);
+        this.isByType = false;
+      }
+    });
+  } 
+  
+  
 
   redirectToAbout() {
     this.router.navigate(['/charts']);
   }
 
+
   getPage(offset: number): void {
     if (!this.isLoading && !this.isLastPage) {
       this.isLoading = true;
-      this.pokemonService.getPokemonList(offset).subscribe((list: PokemonList[]) => {
-        if (list.length === 0) {
-          this.isLastPage = true;
+      this.pokemonService.getPokemonList(offset).subscribe(
+        (list: PokemonList[]) => {
+          if (list.length === 0) {
+            this.isLastPage = true;
+          }
+          if (!this.isLastPage) {
+            this.getPokemon(list);
+          }
+          this.isLoading = false; // Agregamos esta línea para indicar que la carga ha finalizado
+        },
+        (error: any) => {
+          this.isLoading = false; // Agregamos esta línea para indicar que la carga ha finalizado
+          // Manejo de errores, si es necesario
         }
-
-        if (!this.isLastPage) {
-          this.getPokemon(list);
-        }
-      });
+      );
     }
   }
+  
+
 
   onSearchPokemon(): void {
     const value = this.search.value;
@@ -90,12 +113,23 @@ export class CardPokemonComponent implements OnInit {
     }
   }
 
-  onScroll(event: Event): void {
+
+  onScroll(event: Event): void {     
     const element: HTMLDivElement = event.target as HTMLDivElement;
     if (element.scrollHeight - element.scrollTop < 1000) {
-      this.getPage(this.offset);
+      if (this.isByType) {
+        return;
+      } else {
+        (this.getPage(this.offset));
+      }
     }
   }
+  
+  
+  
+  
+  
+  
 
   private getPokemon(list: PokemonList[]): void {
     const arr: Observable<PokemonDetail>[] = [];
@@ -110,13 +144,16 @@ export class CardPokemonComponent implements OnInit {
     });
   }
 
+
   getPrincipalType(list: any[]): string {
     return list.filter((x) => x.slot === 1)[0]?.type.name;
   }
 
+
   getAbilities(pokemon: PokemonDetail): string {
     return pokemon.abilities.map((ability) => ability.ability.name).join(', ');
   }
+
 
   showPopup(pokemon: PokemonDetail) {
     this.selectedPokemon = pokemon;
@@ -132,21 +169,34 @@ export class CardPokemonComponent implements OnInit {
       popupContainer.style.display = 'none';
     }
   }
-
-
-  getAmountPokemonByType(): void {
-    const url = 'https://pokeapi.co/api/v2/type';
-    this.http.get<any>(url).subscribe(response => {
-      this. types = response.results;
-
-      // Obtener cantidad de Pokémon para cada tipo
-      for (const tipo of this. types) {
-        this.http.get<any>(tipo.url).subscribe(tipoResponse => {
-          tipo.cantidadPokemon = tipoResponse.pokemon.length;
+ 
+  getAmountPokemonByType(nameParam: any): void {       
+    if (nameParam) {
+      const url = `https://pokeapi.co/api/v2/type/${nameParam}`;
+      this.http.get<any>(url).subscribe(response => {        
+        const pokemonList = response.pokemon.map((pokemon: any) => pokemon.pokemon);
+        const requests: Observable<any>[] = pokemonList.map((pokemon: any) =>
+          this.http.get<any>(pokemon.url)
+        );
+  
+        forkJoin(requests).subscribe(pokemonResponses => {
+          this.pokemons = pokemonResponses.map((response: any) => {
+            const pokemon: PokemonDetail = new PokemonDetail();
+            pokemon.name = response.name;
+            pokemon.height = response.height;
+            pokemon.weight = response.weight;
+            pokemon.abilities = response.abilities;
+            pokemon.stats = response.stats;
+            pokemon.types = response.types;
+            pokemon.sprites = response.sprites;
+            return pokemon;
+          });
         });
-      }
-    });
-  }
+      });
+    }
+  } 
+  
 }
+
 
 
